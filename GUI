@@ -1,0 +1,272 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package flightreservationsystem;
+
+/**
+ *
+ * @author TEJASHWINI
+ */
+import javax.swing.*;
+import java.awt.*;
+import java.util.*;
+
+class Flight {
+    private String flightNumber, source, destination, date;
+    private int availableSeats;
+    private double price;
+
+    public Flight(String flightNumber, String source, String destination, 
+                 String date, int availableSeats, double price) {
+        this.flightNumber = flightNumber;
+        this.source = source;
+        this.destination = destination;
+        this.date = date;
+        this.availableSeats = availableSeats;
+        this.price = price;
+    }
+
+    // Getters
+    public String getFlightNumber() { return flightNumber; }
+    public String getSource() { return source; }
+    public String getDestination() { return destination; }
+    public String getDate() { return date; }
+    public int getAvailableSeats() { return availableSeats; }
+    public double getPrice() { return price; }
+
+    public boolean bookSeats(int seats) {
+        if (availableSeats >= seats) {
+            availableSeats -= seats;
+            return true;
+        }
+        return false;
+    }
+}
+
+public class FlightReservationSystem extends JFrame {
+    // Pastel Colors
+    private final Color PASTEL_BLUE = new Color(188, 227, 249);
+    private final Color PASTEL_PINK = new Color(255, 215, 221);
+    private final Color PASTEL_PURPLE = new Color(229, 212, 241);
+    private final Color PASTEL_GREEN = new Color(193, 240, 201);
+    private final Color BACKGROUND_COLOR = new Color(248, 249, 250);
+
+    private ArrayList<Flight> flights;
+    private JPanel cardPanel;
+    private CardLayout cardLayout;
+    private JPanel homePanel, searchPanel, bookingPanel, profilePanel;
+    
+    public FlightReservationSystem() {
+        flights = new ArrayList<>();
+        initializeFlights();
+        setupFrame();
+        createPanels();
+        addNavigationBar();
+    }
+
+    private void initializeFlights() {
+        flights.add(new Flight("FL001", "New York", "London", "2024-11-20", 200, 800.0));
+        flights.add(new Flight("FL002", "London", "Paris", "2024-11-21", 150, 300.0));
+        flights.add(new Flight("FL003", "Paris", "Tokyo", "2024-11-22", 300, 1200.0));
+        flights.add(new Flight("FL004", "Tokyo", "Sydney", "2024-11-23", 250, 1000.0));
+    }
+
+    private void setupFrame() {
+        setTitle("Flight Reservation System");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(800, 600);
+        setLocationRelativeTo(null);
+        
+        cardLayout = new CardLayout();
+        cardPanel = new JPanel(cardLayout);
+        add(cardPanel);
+    }
+
+    private JButton createStyledButton(String text, Color bgColor) {
+        JButton button = new JButton(text);
+        button.setBackground(bgColor);
+        button.setForeground(Color.BLACK);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        return button;
+    }
+
+    private void addNavigationBar() {
+        JPanel navBar = new JPanel();
+        navBar.setBackground(PASTEL_BLUE);
+        navBar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JButton homeBtn = createStyledButton("Home", PASTEL_PINK);
+        JButton searchBtn = createStyledButton("Search Flights", PASTEL_PURPLE);
+        JButton bookingBtn = createStyledButton("Book Ticket", PASTEL_GREEN);
+        JButton profileBtn = createStyledButton("Profile", PASTEL_BLUE);
+
+        homeBtn.addActionListener(e -> cardLayout.show(cardPanel, "Home"));
+        searchBtn.addActionListener(e -> cardLayout.show(cardPanel, "Search"));
+        bookingBtn.addActionListener(e -> cardLayout.show(cardPanel, "Booking"));
+        profileBtn.addActionListener(e -> cardLayout.show(cardPanel, "Profile"));
+
+        navBar.add(homeBtn);
+        navBar.add(searchBtn);
+        navBar.add(bookingBtn);
+        navBar.add(profileBtn);
+
+        add(navBar, BorderLayout.NORTH);
+    }
+
+    private void createPanels() {
+        // Home Panel
+        homePanel = new JPanel();
+        homePanel.setBackground(PASTEL_PINK);
+        homePanel.setLayout(new BoxLayout(homePanel, BoxLayout.Y_AXIS));
+        JLabel welcomeLabel = new JLabel("Welcome to Flight Reservation System");
+        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        homePanel.add(Box.createVerticalGlue());
+        homePanel.add(welcomeLabel);
+        homePanel.add(Box.createVerticalGlue());
+
+        // Search Panel
+        searchPanel = new JPanel();
+        searchPanel.setBackground(PASTEL_PURPLE);
+        setupSearchPanel();
+
+        // Booking Panel
+        bookingPanel = new JPanel();
+        bookingPanel.setBackground(PASTEL_GREEN);
+        setupBookingPanel();
+
+        // Profile Panel
+        profilePanel = new JPanel();
+        profilePanel.setBackground(PASTEL_BLUE);
+        setupProfilePanel();
+
+        cardPanel.add(homePanel, "Home");
+        cardPanel.add(searchPanel, "Search");
+        cardPanel.add(bookingPanel, "Booking");
+        cardPanel.add(profilePanel, "Profile");
+    }
+
+    private void setupSearchPanel() {
+        searchPanel.setLayout(new BorderLayout(10, 10));
+        
+        // Search Form
+        JPanel searchForm = new JPanel(new GridLayout(4, 2, 10, 10));
+        searchForm.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        searchForm.setBackground(PASTEL_PURPLE);
+
+        searchForm.add(new JLabel("From:"));
+        searchForm.add(new JComboBox<>(new String[]{"New York", "London", "Paris", "Tokyo", "Sydney"}));
+        
+        searchForm.add(new JLabel("To:"));
+        searchForm.add(new JComboBox<>(new String[]{"London", "Paris", "Tokyo", "Sydney", "New York"}));
+        
+        searchForm.add(new JLabel("Date:"));
+        searchForm.add(new JTextField("2024-11-20"));
+        
+        JButton searchButton = createStyledButton("Search Flights", PASTEL_BLUE);
+        searchForm.add(searchButton);
+
+        // Results Area
+        JTextArea resultsArea = new JTextArea();
+        resultsArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(resultsArea);
+
+        searchButton.addActionListener(e -> {
+            StringBuilder sb = new StringBuilder();
+            for (Flight flight : flights) {
+                sb.append(String.format("Flight: %s\nFrom: %s To: %s\nDate: %s\nPrice: $%.2f\n\n",
+                    flight.getFlightNumber(), flight.getSource(), 
+                    flight.getDestination(), flight.getDate(), flight.getPrice()));
+            }
+            resultsArea.setText(sb.toString());
+        });
+
+        searchPanel.add(searchForm, BorderLayout.NORTH);
+        searchPanel.add(scrollPane, BorderLayout.CENTER);
+    }
+
+    private void setupBookingPanel() {
+        bookingPanel.setLayout(new BorderLayout(10, 10));
+        
+        JPanel bookingForm = new JPanel(new GridLayout(5, 2, 10, 10));
+        bookingForm.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        bookingForm.setBackground(PASTEL_GREEN);
+
+        bookingForm.add(new JLabel("Flight Number:"));
+        JComboBox<String> flightBox = new JComboBox<>(
+            flights.stream()
+                  .map(Flight::getFlightNumber)
+                  .toArray(String[]::new));
+        bookingForm.add(flightBox);
+
+        bookingForm.add(new JLabel("Passenger Name:"));
+        JTextField nameField = new JTextField();
+        bookingForm.add(nameField);
+
+        bookingForm.add(new JLabel("Number of Seats:"));
+        JSpinner seatsSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
+        bookingForm.add(seatsSpinner);
+
+        bookingForm.add(new JLabel("Email:"));
+        bookingForm.add(new JTextField());
+
+        JButton bookButton = createStyledButton("Book Now", PASTEL_BLUE);
+        bookingForm.add(bookButton);
+
+        bookButton.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, 
+                "Booking confirmed!\nThank you for choosing our airline.",
+                "Success", JOptionPane.INFORMATION_MESSAGE);
+        });
+
+        bookingPanel.add(bookingForm, BorderLayout.NORTH);
+    }
+
+    private void setupProfilePanel() {
+        profilePanel.setLayout(new BorderLayout(10, 10));
+        
+        JPanel profileForm = new JPanel(new GridLayout(6, 2, 10, 10));
+        profileForm.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        profileForm.setBackground(PASTEL_BLUE);
+
+        profileForm.add(new JLabel("Name:"));
+        profileForm.add(new JTextField("John Doe"));
+        
+        profileForm.add(new JLabel("Email:"));
+        profileForm.add(new JTextField("john@example.com"));
+        
+        profileForm.add(new JLabel("Phone:"));
+        profileForm.add(new JTextField("+1234567890"));
+        
+        profileForm.add(new JLabel("Address:"));
+        profileForm.add(new JTextField("123 Main St"));
+        
+        profileForm.add(new JLabel("Passport Number:"));
+        profileForm.add(new JTextField("ABC123XYZ"));
+
+        JButton updateButton = createStyledButton("Update Profile", PASTEL_PURPLE);
+        profileForm.add(updateButton);
+
+        updateButton.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, 
+                "Profile updated successfully!",
+                "Success", JOptionPane.INFORMATION_MESSAGE);
+        });
+
+        profilePanel.add(profileForm, BorderLayout.NORTH);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            new FlightReservationSystem().setVisible(true);
+        });
+    }
+}
